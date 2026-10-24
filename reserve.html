@@ -1,0 +1,220 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>WEB予約｜脱毛salon8（はち）</title>
+<meta name="description" content="脱毛salon8（はち）のWEB予約。メニュー・担当スタッフ・空いている日時を選んで、そのまま予約できます。">
+<meta name="robots" content="noindex">
+<meta name="theme-color" content="#F7F4EF">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&family=Zen+Kaku+Gothic+New:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css?v=4">
+</head>
+<body class="r-body">
+
+<div class="proto-bar" id="demo-bar" hidden>デモモード：仮のスタッフ・仮の空き枠です。予約もメールも実際には送られません。</div>
+
+<header class="site-header r-header">
+  <div class="wrap">
+    <a class="logo" href="index.html" aria-label="脱毛salon8（はち） HPへ">
+      <span class="logo-8">8</span>
+      <span class="logo-txt"><small>DATSUMOU SALON</small><span>WEB予約</span></span>
+    </a>
+    <a class="r-home" href="index.html">HPを見る</a>
+  </div>
+</header>
+
+<main class="r-main">
+  <ol class="r-progress" id="progress" aria-label="予約の手順">
+    <li data-p="1">メニュー</li>
+    <li data-p="2">スタッフ</li>
+    <li data-p="3">日時</li>
+    <li data-p="4">お客様情報</li>
+    <li data-p="5">確認</li>
+  </ol>
+
+  <p class="line-chip" id="line-chip" hidden></p>
+  <p class="loading-line" id="boot">読み込み中…</p>
+  <div class="alert" id="boot-error" hidden></div>
+  <div class="alert" id="auth-alert" hidden></div>
+
+  <!-- 1. メニュー -->
+  <section class="r-step" data-step="1" hidden>
+    <h1 class="r-title">メニューを選ぶ</h1>
+    <p class="r-sub">1回のご予約で選べるメニューは1つです。</p>
+    <div class="seg r-seg" role="tablist" aria-label="男性・女性の切り替え">
+      <button type="button" role="tab" data-g="male" aria-selected="true"><span class="en">MEN</span>男性</button>
+      <button type="button" role="tab" data-g="female" aria-selected="false"><span class="en">WOMEN</span>女性</button>
+    </div>
+    <div class="pick-list" id="menu-picks"></div>
+  </section>
+
+  <!-- 2. スタッフ -->
+  <section class="r-step" data-step="2" hidden>
+    <button type="button" class="r-back" data-back>メニューを選び直す</button>
+    <h1 class="r-title">担当スタッフを選ぶ</h1>
+    <dl class="picked" data-picked></dl>
+    <div class="pick-list" id="staff-picks"></div>
+  </section>
+
+  <!-- 3. 日時 -->
+  <section class="r-step" data-step="3" hidden>
+    <button type="button" class="r-back" data-back>スタッフを選び直す</button>
+    <h1 class="r-title" id="date-title">日時を選ぶ</h1>
+    <dl class="picked" data-picked></dl>
+    <div class="alert" id="taken-alert" hidden></div>
+    <div class="cal" id="cal">
+      <div class="cal-head">
+        <button type="button" class="cal-nav" id="cal-prev" aria-label="前の月">‹</button>
+        <strong id="cal-title"></strong>
+        <button type="button" class="cal-nav" id="cal-next" aria-label="次の月">›</button>
+      </div>
+      <div class="cal-grid" id="cal-grid"></div>
+      <div class="cal-legend"><span><b>○</b> 空きあり</span><span><b style="color:var(--tbd)">△</b> 残りわずか</span><span>× 満席</span><span>休 お休み</span></div>
+    </div>
+    <p class="cal-msg" id="cal-msg" hidden></p>
+    <div class="times" id="times" hidden>
+      <h2 id="times-title"></h2>
+      <div class="times-grid" id="times-grid"></div>
+    </div>
+  </section>
+
+  <!-- 4. お客様情報 -->
+  <section class="r-step" data-step="4" hidden>
+    <button type="button" class="r-back" data-back>日時を選び直す</button>
+    <h1 class="r-title">お客様情報</h1>
+    <dl class="picked" data-picked></dl>
+    <p class="prefill-note" id="prefill-note" hidden>前回LINEでご予約いただいたときの内容を入れています。変わったところがあれば直してください。</p>
+    <form class="form" id="form" novalidate>
+      <div class="field" data-f="name">
+        <label for="f-name">氏名<span class="req">必須</span></label>
+        <input class="input" id="f-name" name="name" type="text" autocomplete="name" placeholder="例）池袋 太郎" maxlength="40">
+        <p class="hint">姓と名の間にスペースを入れてください</p>
+        <p class="err">姓と名の間にスペースを入れて入力してください</p>
+      </div>
+      <div class="field" data-f="kana">
+        <label for="f-kana">フリガナ<span class="req">必須</span></label>
+        <input class="input" id="f-kana" name="kana" type="text" placeholder="例）イケブクロ タロウ" maxlength="40">
+        <p class="hint">姓と名の間にスペースを入れてください</p>
+        <p class="err">カタカナで、姓と名の間にスペースを入れて入力してください</p>
+      </div>
+      <div class="field" data-f="sex">
+        <span class="label">性別<span class="req">必須</span></span>
+        <div class="radios radios-3">
+          <label class="radio"><input type="radio" name="sex" value="女性"><span>女性</span></label>
+          <label class="radio"><input type="radio" name="sex" value="男性"><span>男性</span></label>
+          <label class="radio"><input type="radio" name="sex" value="回答しない"><span>回答しない</span></label>
+        </div>
+        <p class="err">どれかを選んでください</p>
+      </div>
+      <div class="field" data-f="birth">
+        <span class="label" id="birth-label">生年月日<span class="req">必須</span></span>
+        <div class="birth" role="group" aria-labelledby="birth-label">
+          <select class="input select" name="by" aria-label="生まれた年"></select>
+          <select class="input select" name="bm" aria-label="生まれた月"></select>
+          <select class="input select" name="bd" aria-label="生まれた日"></select>
+        </div>
+        <p class="err">生年月日を選んでください</p>
+      </div>
+      <div class="field" data-f="tel">
+        <label for="f-tel">電話番号<span class="req">必須</span></label>
+        <input class="input" id="f-tel" name="tel" type="tel" inputmode="tel" autocomplete="tel" placeholder="例）09012345678" maxlength="15">
+        <p class="err">電話番号を正しく入力してください</p>
+      </div>
+      <div class="field" data-f="email">
+        <label for="f-email">メールアドレス<span class="req">必須</span></label>
+        <input class="input" id="f-email" name="email" type="email" inputmode="email" autocomplete="email" placeholder="例）hachi@example.com" maxlength="100">
+        <p class="hint">予約の確認メールが届きます。</p>
+        <p class="err">メールアドレスを正しく入力してください</p>
+      </div>
+      <div class="field" data-f="visit">
+        <span class="label">ご来店<span class="req">必須</span></span>
+        <div class="radios">
+          <label class="radio"><input type="radio" name="visit" value="初めて"><span>初めて</span></label>
+          <label class="radio"><input type="radio" name="visit" value="2回目以降"><span>2回目以降</span></label>
+        </div>
+        <p class="err">どちらかを選んでください</p>
+      </div>
+      <div class="field" data-f="focus">
+        <label for="f-focus">多めに施術してほしい部位<span class="opt">任意</span></label>
+        <input class="input" id="f-focus" name="focus" type="text" maxlength="60" placeholder="例）あご下、すね">
+      </div>
+      <div class="field" data-f="early">
+        <label for="f-early">早めの施術希望<span class="opt">任意</span></label>
+        <select class="input select" id="f-early" name="early">
+          <option value="いいえ">いいえ</option>
+          <option value="はい">はい</option>
+        </select>
+      </div>
+      <div class="field" data-f="note">
+        <label for="f-note">ご要望・気になること<span class="opt">任意</span></label>
+        <textarea class="textarea" id="f-note" name="note" maxlength="500" placeholder="例）肌が弱いので相談したい"></textarea>
+      </div>
+      <div class="hp-field" aria-hidden="true">
+        <label>この欄は空のままにしてください<input type="text" name="website" tabindex="-1" autocomplete="off"></label>
+      </div>
+      <div class="field" data-f="agree">
+        <label class="check"><input type="checkbox" name="agree" value="1"><span>プライバシーポリシーに同意します</span></label>
+        <button type="button" class="link-btn" id="open-privacy">プライバシーポリシーを読む</button>
+        <p class="err">同意が必要です</p>
+      </div>
+      <div class="r-actions">
+        <button class="btn btn-primary" type="submit">入力内容を確認する <span class="arrow">→</span></button>
+      </div>
+    </form>
+  </section>
+
+  <!-- 5. 確認 -->
+  <section class="r-step" data-step="5" hidden>
+    <button type="button" class="r-back" data-back>入力内容を直す</button>
+    <h1 class="r-title" id="confirm-title">ご予約内容の確認</h1>
+    <p class="r-sub">内容をご確認のうえ「予約を確定する」を押してください。</p>
+    <dl class="confirm" id="confirm"></dl>
+    <div class="alert" id="send-error" hidden></div>
+    <div class="r-actions">
+      <button class="btn btn-primary" type="button" id="submit">予約を確定する</button>
+    </div>
+    <p class="r-note">ご予約の変更・キャンセルは公式LINEからご連絡ください。</p>
+  </section>
+
+  <!-- 完了 -->
+  <section class="r-step" data-step="6" hidden>
+    <div class="done-head">
+      <div class="done-mark" aria-hidden="true">
+        <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>
+      </div>
+      <h1 class="r-title" id="done-title">ご予約が完了しました</h1>
+      <p class="r-sub" id="done-mail"></p>
+      <p class="done-id" id="done-id"></p>
+    </div>
+    <p class="demo-note" id="done-demo" hidden>デモのため、実際には予約・メール送信はされていません。</p>
+    <dl class="confirm" id="done-summary"></dl>
+    <div class="r-actions">
+      <a class="btn btn-ghost" id="gcal" href="#" target="_blank" rel="noopener">Googleカレンダーに追加</a>
+      <a class="btn btn-primary" id="done-mypage" href="mypage.html" hidden>予約の確認・変更・キャンセル</a>
+      <a class="btn btn-line" id="done-line" href="https://lin.ee/BdPU7Iq" target="_blank" rel="noopener">変更・キャンセルは公式LINEへ</a>
+      <a class="btn btn-ghost" href="index.html">HPに戻る</a>
+    </div>
+  </section>
+</main>
+
+<!-- プライバシーポリシー（予約画面から離れずに読めるように重ねて開く） -->
+<dialog class="sheet" id="privacy-dialog" aria-labelledby="privacy-title">
+  <div class="sheet-head">
+    <strong id="privacy-title">プライバシーポリシー</strong>
+    <button type="button" class="sheet-close" data-close aria-label="閉じる">×</button>
+  </div>
+  <div class="sheet-body doc" id="privacy-body"><p>読み込み中…</p></div>
+  <div class="sheet-foot"><button type="button" class="btn btn-primary" data-close>閉じる</button></div>
+</dialog>
+
+<script src="js/config.js?v=4"></script>
+<script src="js/data.js?v=4"></script>
+<script src="js/api.js?v=4"></script>
+<script src="js/line.js?v=2"></script>
+<script src="js/reserve.js?v=4"></script>
+</body>
+</html>

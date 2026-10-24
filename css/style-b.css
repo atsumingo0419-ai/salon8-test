@@ -1,0 +1,325 @@
+/* B案（高級感のある美容サロン）
+   style.css の上に重ねて読む。色・文字・角の丸さを入れ替え、B案だけの部品を足す */
+.theme-b {
+  --bg: #F7F3EC;
+  --surface: #FDFBF7;
+  --surface-2: #EFE8DC;
+  --ink: #2A2421;
+  --muted: #857A70;
+  --line: #E4DACA;
+  --accent: #2A2421;
+  --accent-deep: #1C1715;
+  --accent-soft: #F1EADF;
+  --sand: #B59A6A;
+  --gold: #A88A57;
+  --gold-light: #D9C9A6;
+  --men: #2A2421;
+  --women: #2A2421;
+  --radius: 4px;
+  --radius-sm: 3px;
+  --shadow: 0 12px 40px rgba(42, 36, 33, .06);
+  --font-mincho: "Shippori Mincho", "Hiragino Mincho ProN", "Yu Mincho", serif;
+  letter-spacing: .06em;
+}
+.theme-b ::selection { background: var(--gold-light); }
+
+/* ロゴ（線画のハチ＋明朝の店名） */
+.bee { display: block; color: var(--gold); }
+.logo-b { display: inline-flex; align-items: center; gap: 10px; text-decoration: none; }
+.logo-b .bee { width: 38px; }
+.logo-b-txt { display: flex; flex-direction: column; line-height: 1.2; }
+.logo-b-txt .ja { font-family: var(--font-mincho); font-size: 17px; font-weight: 600; letter-spacing: .08em; }
+.logo-b-txt small { font-family: var(--font-en); font-size: 10px; letter-spacing: .32em; color: var(--muted); text-transform: uppercase; }
+
+/* ボタン */
+.theme-b .btn { border-radius: 2px; letter-spacing: .18em; font-weight: 500; font-size: 14px; min-height: 54px; }
+.theme-b .btn-primary { background: var(--ink); color: #F7F3EC; box-shadow: none; }
+.theme-b .btn-primary:hover { background: var(--gold); }
+.theme-b .btn-line,
+.theme-b .btn-outline { background: transparent; color: var(--ink); border-color: rgba(42, 36, 33, .35); }
+.theme-b .btn-line::before {
+  content: "";
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #06C755;
+}
+.theme-b .btn-line:hover,
+.theme-b .btn-outline:hover { background: var(--ink); color: #F7F3EC; border-color: var(--ink); }
+.theme-b .btn-ghost { border-color: rgba(42, 36, 33, .35); }
+.theme-b .btn-sm { min-height: 40px; font-size: 12px; padding: 0 18px; }
+
+/* ヘッダー */
+.theme-b .site-header { background: rgba(247, 243, 236, .92); }
+.theme-b .gnav { gap: 30px; }
+.theme-b .gnav a { font-size: 12px; letter-spacing: .16em; }
+
+.theme-b .proto-bar a { color: inherit; font-weight: 700; margin-left: 8px; }
+
+/* ヒーロー */
+.hero-b {
+  position: relative;
+  padding: 64px 0 72px;
+  text-align: center;
+  background:
+    radial-gradient(70% 55% at 50% 30%, rgba(217, 201, 166, .35), transparent 70%),
+    var(--bg);
+}
+.hero-b::before {
+  content: "";
+  position: absolute;
+  inset: 12px;
+  border: 1px solid var(--gold-light);
+  pointer-events: none;
+}
+.hero-b::after {
+  content: "";
+  position: absolute;
+  inset: 17px;
+  border: 1px solid rgba(217, 201, 166, .45);
+  pointer-events: none;
+}
+.hero-b .bee-hero { width: 88px; margin: 0 auto; }
+.eyebrow-b {
+  margin-top: 22px;
+  font-family: var(--font-en);
+  font-size: 12px;
+  letter-spacing: .38em;
+  text-transform: uppercase;
+  color: var(--gold);
+}
+.hero-b-title {
+  margin-top: 18px;
+  font-family: var(--font-mincho);
+  font-weight: 500;
+  font-size: 29px;
+  line-height: 1.7;
+  letter-spacing: .14em;
+}
+.hero-b-lead { margin-top: 18px; font-size: 13.5px; line-height: 2.1; color: var(--muted); }
+.hero-b-price {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 12px;
+  margin-top: 30px;
+  padding: 14px 4px;
+  border-top: 1px solid var(--gold-light);
+  border-bottom: 1px solid var(--gold-light);
+}
+.hero-b-price .label { font-family: var(--font-mincho); font-size: 14px; letter-spacing: .16em; }
+.hero-b-price .num { font-family: var(--font-en); font-size: 34px; font-weight: 500; line-height: 1; letter-spacing: .04em; }
+.hero-b-price .per { font-size: 12px; color: var(--muted); }
+.hero-b-cta { display: flex; flex-direction: column; gap: 12px; max-width: 340px; margin: 30px auto 0; }
+
+/* 見出し */
+.sec-head-b { text-align: center; margin-bottom: 40px; }
+.sec-head-b .en {
+  font-family: var(--font-en);
+  font-size: 12px;
+  letter-spacing: .4em;
+  text-transform: uppercase;
+  color: var(--gold);
+}
+.sec-head-b .en::after {
+  content: "";
+  display: block;
+  width: 1px;
+  height: 22px;
+  margin: 12px auto 0;
+  background: var(--gold-light);
+}
+.sec-head-b h2 {
+  margin-top: 12px;
+  font-family: var(--font-mincho);
+  font-weight: 500;
+  font-size: 22px;
+  line-height: 1.8;
+  letter-spacing: .14em;
+}
+.sec-head-b p { margin-top: 12px; font-size: 13px; color: var(--muted); }
+.theme-b .section { padding: 84px 0; }
+.theme-b .section-alt { background: var(--surface); }
+
+/* コンセプト */
+.concept-grid { display: grid; gap: 40px; }
+.arch {
+  width: 62%;
+  max-width: 340px;
+  margin: 0 auto;
+  aspect-ratio: 3 / 4;
+  border-radius: 999px 999px 0 0;
+  background:
+    radial-gradient(90% 60% at 30% 20%, rgba(217, 201, 166, .55), transparent 65%),
+    linear-gradient(180deg, #EFE8DC, #E6DCCB);
+  outline: 1px solid var(--gold-light);
+  outline-offset: 8px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  padding-bottom: 18px;
+  font-size: 11px;
+  letter-spacing: .14em;
+  color: var(--muted);
+}
+.concept-body { font-size: 14px; line-height: 2.2; color: var(--muted); text-align: center; }
+.points-b { margin-top: 36px; border-top: 1px solid var(--line); }
+.points-b li {
+  display: grid;
+  grid-template-columns: 44px 1fr;
+  gap: 2px 14px;
+  padding: 20px 4px;
+  border-bottom: 1px solid var(--line);
+}
+.points-b .no { grid-row: span 2; font-family: var(--font-en); font-size: 22px; color: var(--gold); line-height: 1.4; }
+.points-b h3 { font-family: var(--font-mincho); font-weight: 600; font-size: 16px; letter-spacing: .1em; }
+.points-b p { font-size: 13px; color: var(--muted); }
+.theme-b .note-small { text-align: center; }
+
+/* メニュー表 */
+.theme-b .menu-wrap { max-width: 640px; margin: 0 auto; }
+.theme-b .seg {
+  background: none;
+  border-radius: 0;
+  padding: 0;
+  gap: 0;
+  border-bottom: 1px solid var(--line);
+}
+.theme-b .seg button {
+  border-radius: 0;
+  min-height: 52px;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
+  font-weight: 500;
+  letter-spacing: .14em;
+}
+.theme-b .seg button .en { font-weight: 500; letter-spacing: .24em; }
+.theme-b .seg button[aria-selected="true"][data-g="male"],
+.theme-b .seg button[aria-selected="true"][data-g="female"] {
+  background: none;
+  color: var(--ink);
+  border-bottom-color: var(--gold);
+}
+.theme-b .menu-list { border-top: 0; margin-top: 8px; }
+.theme-b .menu-row { padding: 20px 2px; }
+.theme-b .menu-name { font-family: var(--font-mincho); font-weight: 600; font-size: 16px; letter-spacing: .1em; }
+.theme-b .menu-price .num { font-size: 24px; font-weight: 500; }
+.theme-b .menu-go { font-size: 10px; letter-spacing: .2em; color: var(--gold); }
+
+/* 流れ */
+.theme-b .flow li { border-radius: var(--radius); border: 1px solid var(--line); background: var(--bg); }
+.theme-b .section-alt .flow li { background: var(--bg); }
+.theme-b .flow li::before { content: counter(flow, upper-roman); color: var(--gold); font-size: 24px; top: 20px; }
+.theme-b .flow h3 { font-family: var(--font-mincho); font-weight: 600; letter-spacing: .08em; }
+
+/* FAQ・アクセス */
+.theme-b .faq summary { font-weight: 500; }
+.theme-b .faq summary::before { color: var(--gold); }
+.theme-b .info-table th { font-weight: 500; letter-spacing: .12em; }
+.theme-b .map { border-radius: var(--radius); filter: grayscale(1) sepia(.18) contrast(.95); }
+
+/* 最後の予約誘導 */
+.cta-b {
+  position: relative;
+  padding: 80px 0;
+  text-align: center;
+  background: var(--ink);
+  color: #F7F3EC;
+}
+.cta-b::before {
+  content: "";
+  position: absolute;
+  inset: 12px;
+  border: 1px solid rgba(217, 201, 166, .35);
+  pointer-events: none;
+}
+.cta-b .bee { width: 64px; margin: 0 auto; color: var(--gold-light); }
+.cta-b .en { margin-top: 18px; font-family: var(--font-en); font-size: 12px; letter-spacing: .4em; text-transform: uppercase; color: var(--gold-light); }
+.cta-b h2 { margin-top: 12px; font-family: var(--font-mincho); font-weight: 500; font-size: 22px; letter-spacing: .14em; }
+.cta-b p { margin-top: 12px; font-size: 13px; opacity: .8; }
+.cta-b .btns { position: relative; display: flex; flex-direction: column; gap: 12px; max-width: 340px; margin: 30px auto 0; }
+.cta-b .btn-primary { background: #F7F3EC; color: var(--ink); }
+.cta-b .btn-primary:hover { background: var(--gold-light); }
+.cta-b .btn-line { color: #F7F3EC; border-color: rgba(247, 243, 236, .45); }
+.cta-b .btn-line:hover { background: #F7F3EC; color: var(--ink); }
+
+/* フッター */
+.footer-b { padding: 48px 0 calc(48px + var(--bar-h)); text-align: center; font-size: 12px; color: var(--muted); }
+.footer-b .logo-b { flex-direction: column; gap: 8px; }
+.footer-b .logo-b .bee { width: 46px; }
+.footer-b .foot-links { justify-content: center; margin-top: 22px; }
+.footer-b p { margin-top: 10px; }
+
+.theme-b .bottom-bar { background: rgba(247, 243, 236, .96); }
+.theme-b .bottom-bar .btn { min-height: 48px; letter-spacing: .12em; }
+
+@media (min-width: 768px) {
+  .hero-b { padding: 110px 0 120px; }
+  .hero-b::before { inset: 22px; }
+  .hero-b::after { inset: 28px; }
+  .hero-b .bee-hero { width: 112px; }
+  .hero-b-title { font-size: 44px; }
+  .hero-b-lead { font-size: 15px; }
+  .hero-b-cta { flex-direction: row; max-width: 560px; justify-content: center; }
+  .hero-b-cta .btn { flex: 1; }
+  .theme-b .section { padding: 120px 0; }
+  .sec-head-b h2 { font-size: 28px; }
+  .concept-grid { grid-template-columns: 1fr 1.15fr; gap: 72px; align-items: center; }
+  .concept-body { text-align: left; }
+  .concept-grid .sec-head-b { text-align: left; }
+  .concept-grid .sec-head-b .en::after { margin-left: 0; }
+  .theme-b .concept-grid .note-small { text-align: left; }
+  .cta-b { padding: 110px 0; }
+  .cta-b h2 { font-size: 28px; }
+  .cta-b .btns { flex-direction: row; max-width: 560px; }
+  .cta-b .btns .btn { flex: 1; }
+}
+
+/* ---- 予約フォーム（B案） ---- */
+.theme-b .r-header .logo-b .bee { width: 32px; }
+.theme-b .r-title { font-family: var(--font-mincho); font-weight: 600; letter-spacing: .12em; }
+.theme-b .r-progress li::before { height: 2px; }
+.theme-b .r-progress li.done::before, .theme-b .r-progress li.now::before { background: var(--gold); }
+.theme-b .r-seg { margin-top: 24px; }
+.theme-b .pick { border: 1px solid var(--line); }
+.theme-b .pick:hover { border-color: var(--gold-light); }
+.theme-b .pick.selected { border-color: var(--ink); background: var(--accent-soft); }
+.theme-b .pick-name { font-family: var(--font-mincho); font-weight: 600; letter-spacing: .08em; }
+.theme-b .pick-price .num { font-weight: 500; }
+.theme-b .avatar { background: var(--accent-soft); color: var(--gold); border: 1px solid var(--gold-light); }
+.theme-b .picked { border: 1px solid var(--line); }
+.theme-b .cal { border: 1px solid var(--line); }
+.theme-b .cal-head strong { font-family: var(--font-mincho); font-weight: 600; }
+.theme-b .cal-nav { border-color: var(--line); }
+.theme-b .cal-day { border-radius: 2px; }
+.theme-b .cal-day .m { color: var(--gold); }
+.theme-b .cal-day.full .m, .theme-b .cal-day.off .m { color: var(--muted); }
+.theme-b .cal-day.selected .m { color: var(--gold-light); }
+.theme-b .cal-legend b { color: var(--gold) !important; }
+.theme-b .cal-day.ok:hover { background: var(--accent-soft); }
+.theme-b .cal-day.selected { background: var(--ink); border-color: var(--ink); }
+.theme-b .time-btn { border-radius: 2px; border-width: 1px; font-weight: 500; }
+.theme-b .time-btn:hover { border-color: var(--gold); }
+.theme-b .time-btn.selected { background: var(--ink); border-color: var(--ink); }
+.theme-b .input, .theme-b .textarea { border-radius: 2px; border-width: 1px; }
+.theme-b .input:focus, .theme-b .textarea:focus { border-color: var(--gold); box-shadow: 0 0 0 3px rgba(217, 201, 166, .35); }
+.theme-b .req { background: var(--gold); }
+.theme-b .radio span { border-radius: 2px; border-width: 1px; font-weight: 500; }
+.theme-b .radio input:checked + span { border-color: var(--ink); background: var(--accent-soft); color: var(--ink); }
+.theme-b .check input { accent-color: var(--ink); }
+.theme-b .link-btn { color: var(--ink); }
+.theme-b .confirm { border: 1px solid var(--line); }
+.theme-b .done-mark { background: var(--accent-soft); color: var(--gold); border: 1px solid var(--gold-light); }
+.theme-b .line-chip { border-radius: 2px; }
+.theme-b .prefill-note { border: 1px solid var(--gold-light); color: var(--ink); }
+.theme-b .staff-price { color: var(--gold); }
+
+/* マイページ（B案） */
+.theme-b .bk-card { border: 1px solid var(--line); }
+.theme-b .bk-date { font-family: var(--font-mincho); font-weight: 600; letter-spacing: .08em; }
+.theme-b .bk-time { font-family: var(--font-en); font-size: 19px; font-weight: 500; }
+.theme-b .bk-note { border-radius: 2px; }
+.theme-b .btn-danger { border-color: rgba(180, 71, 63, .35); }
+.theme-b .empty { border: 1px solid var(--line); }
+
+.theme-b .sheet { border-radius: 6px 6px 0 0; }
+@media (min-width: 768px) { .theme-b .sheet { border-radius: 6px; } }
