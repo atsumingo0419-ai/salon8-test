@@ -750,6 +750,27 @@ body.has-bar { --bar-h: 72px; }
 .notice[hidden] { display: none; }
 .sheet-body p { margin-top: 10px; }
 
+/* マイページ：これまでのご予約 */
+.hist { margin-top: 36px; }
+.hist[hidden] { display: none; }
+.hist-title { margin: 0; font-size: 15px; font-weight: 700; letter-spacing: .06em; }
+.hist-list { list-style: none; margin: 12px 0 0; padding: 0; background: var(--surface); border-radius: var(--radius); }
+.hist-list li { display: grid; grid-template-columns: auto 1fr; gap: 0 14px; padding: 14px 18px; border-top: 1px solid var(--line); line-height: 1.6; }
+.hist-list li:first-child { border-top: 0; }
+.hist-date { grid-row: span 2; font-size: 13px; font-weight: 700; font-feature-settings: "lnum"; white-space: nowrap; }
+.hist-menu { font-size: 13px; }
+.hist-staff { font-size: 12px; color: var(--muted); }
+
+/* お店用：LINE 通知の申し込み */
+.hint { margin-top: 14px; padding: 12px 14px; border-radius: var(--radius-sm); background: var(--tbd-soft); color: var(--tbd); font-size: 13px; }
+.hint[hidden] { display: none; }
+.hint a { color: inherit; font-weight: 700; }
+.state-card { margin-top: 16px; }
+.state-card[hidden] { display: none; }
+.state-card .bk-actions { grid-template-columns: 1fr; }
+.state-card .bk-actions.two { grid-template-columns: 1fr 1fr; }
+.state-card .bk-actions[hidden] { display: none; }
+
 /* 読み込み中 */
 .spinner {
   width: 18px;

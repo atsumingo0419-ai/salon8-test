@@ -66,6 +66,13 @@
         window.liff.login({ redirectUri: location.href });
       }
     },
+    // 公式LINEを友だち追加しているか（true / false）。分からないときは null
+    // LINE ログインチャネルに公式アカウントをリンクしてあるときだけ分かる（テスト用LINEの作り方 3-5）
+    friendship: function () {
+      if (MOCK) return Promise.resolve(!/[?&]notfriend=1\b/.test(location.search));
+      if (!st.loggedIn || !window.liff) return Promise.resolve(null);
+      return window.liff.getFriendship().then(function (r) { return !!(r && r.friendFlag); }, function () { return null; });
+    },
     // 試作の確認用に ?mockline=1 をリンクにも引き継ぐ
     link: function (href) {
       if (!MOCK) return href;

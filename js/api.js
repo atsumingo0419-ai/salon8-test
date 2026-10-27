@@ -128,6 +128,17 @@
     return computeMonthSlots(month, o);
   }
   function beforeDeadline(b) { return b.s - Date.now() >= (DATA.settings.cancelHours || 24) * 3600000; }
+  // デモの「これまでの予約」（見た目の確認用の仮の2件）
+  function demoHistory() {
+    var m = DATA.menus.filter(function (x) { return x.gender === "female"; })[0] || DATA.menus[0], st = DATA.staff[0];
+    return [35, 70].map(function (n, i) {
+      var date = addDays(todayJST(), -n);
+      return { id: "S8-DEMO-" + (i + 1), date: date, time: "14:00", end: toHM(14 * 60 + (m.minutes || 60)),
+        menuName: m.name + "【" + genderJa(m.gender) + "】", staffName: st.name };
+    });
+  }
+  // デモの「お店の通知先」（このブラウザの中だけ）
+  var NOTIFY_KEY = "salon8-demo-notify";
   function genderJa(g) { return g === "female" ? "女性" : "男性"; }
 
   var demo = {
@@ -189,14 +200,17 @@
       return wait(300).then(function () {
         var userId = demoUser(idToken);
         if (!userId) return { ok: false, reason: "auth" };
-        var today = todayJST();
-        var list = load(DEMO_KEY, []).filter(function (b) {
-          return b.userId === userId && b.status === "予約" && b.date >= today;
-        }).map(function (b) {
+        var now = Date.now();
+        var mine = load(DEMO_KEY, []).filter(function (b) { return b.userId === userId && b.status === "予約"; });
+        var list = mine.filter(function (b) { return b.e > now; }).map(function (b) {
           return { id: b.id, date: b.date, time: b.time, end: b.end, menuName: b.menuName, menuId: b.menuId,
             staffName: b.staffName, staffId: b.staffId, price: b.price, changeable: beforeDeadline(b) };
         }).sort(function (x, y) { return (x.date + x.time) < (y.date + y.time) ? -1 : 1; });
-        return { ok: true, profile: load(CUST_KEY, {})[userId] || null, bookings: list,
+        var history = mine.filter(function (b) { return b.e <= now; }).concat(demoHistory())
+          .sort(function (x, y) { return (x.date + x.time) < (y.date + y.time) ? 1 : -1; })
+          .slice(0, 20)
+          .map(function (b) { return { id: b.id, date: b.date, time: b.time, end: b.end, menuName: b.menuName, staffName: b.staffName }; });
+        return { ok: true, profile: load(CUST_KEY, {})[userId] || null, bookings: list, history: history,
           cancelHours: DATA.settings.cancelHours, lineUrl: DATA.shop.lineUrl };
       });
     },
@@ -211,6 +225,19 @@
         b.status = "キャンセル";
         save(DEMO_KEY, list);
         return { ok: true };
+      });
+    },
+    shopNotify: function (idToken, op) {
+      return wait(400).then(function () {
+        var userId = demoUser(idToken);
+        if (!userId) return { ok: false, reason: "auth" };
+        var all = load(NOTIFY_KEY, {}), state = all[userId] || "未登録", pushed = null;
+        if (op === "apply" && state !== "する" && state !== "承認待ち") state = "承認待ち";
+        else if (op === "stop" && state !== "未登録") state = "しない";
+        else if (op === "test") { if (state !== "する") return { ok: false, reason: "notapproved" }; pushed = true; }
+        all[userId] = state;
+        save(NOTIFY_KEY, all);
+        return { ok: true, state: state, enabled: true, name: "テスト", pushed: pushed, lineUrl: DATA.shop.lineUrl };
       });
     }
   };
@@ -247,7 +274,8 @@
     },
     book: function (p) { return postJSON(Object.assign({ action: "book" }, p)); },
     me: function (idToken) { return postJSON({ action: "me", idToken: idToken }); },
-    cancel: function (idToken, id) { return postJSON({ action: "cancel", idToken: idToken, id: id }); }
+    cancel: function (idToken, id) { return postJSON({ action: "cancel", idToken: idToken, id: id }); },
+    shopNotify: function (idToken, op) { return postJSON({ action: "shopNotify", idToken: idToken, op: op }); }
   };
 
   var impl = DEMO ? demo : live;
@@ -259,6 +287,7 @@
     book: impl.book,
     me: impl.me,
     cancel: impl.cancel,
+    shopNotify: impl.shopNotify,
     util: {
       pad: pad, ymd: ymd, parseYmd: parseYmd, todayJST: todayJST, addDays: addDays, dow: dow,
       daysInMonth: daysInMonth, msAt: msAt, toMin: toMin, toHM: toHM, computeDaySlots: computeDaySlots,

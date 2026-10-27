@@ -1,4 +1,4 @@
-// マイページ：LINE の中で開いて、自分のこれからの予約を見る・日時を変える・キャンセルする
+// マイページ：LINE の中で開いて、自分のこれからの予約を見る・日時を変える・キャンセルする。これまでの予約も見られる
 // 本人かどうかはサーバー（Code.gs の me_ / cancel_）が LINE のログイン情報で確かめる
 (function () {
   "use strict";
@@ -23,11 +23,26 @@
     $("#relogin").addEventListener("click", function () { LINE.relogin(); });
   }
 
+  // これまでのご予約（新しい順・サーバーが20件までにしている）。今年でない日は年もつける
+  function renderHistory(hist) {
+    var year = U.todayJST().slice(0, 4);
+    $("#hist").hidden = hist.length === 0;
+    $("#hist-list").innerHTML = hist.map(function (b) {
+      var y = b.date.slice(0, 4);
+      return "<li>" +
+        '<span class="hist-date">' + (y !== year ? esc(y) + "年" : "") + esc(dateJa(b.date)) + "</span>" +
+        '<span class="hist-menu">' + esc(b.menuName) + "</span>" +
+        '<span class="hist-staff">担当 ' + esc(b.staffName) + "</span>" +
+        "</li>";
+    }).join("");
+  }
+
   function render(me) {
     $("#boot").hidden = true;
     hours = me.cancelHours || hours;
     if (me.lineUrl) $("#talk").href = me.lineUrl;
     $("#note").textContent = "変更・キャンセルは、ご予約の" + hours + "時間前までこの画面からできます。それを過ぎたら、お手数ですがトークでご連絡ください。WEBサイト（ブラウザ）からご予約いただいた分は、ここには表示されません。";
+    renderHistory(me.history || []);
     var list = me.bookings || [];
     $("#empty").hidden = list.length > 0;
     $("#list").innerHTML = list.map(function (b) {

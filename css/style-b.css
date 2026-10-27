@@ -320,6 +320,11 @@
 .theme-b .bk-note { border-radius: 2px; }
 .theme-b .btn-danger { border-color: rgba(180, 71, 63, .35); }
 .theme-b .empty { border: 1px solid var(--line); }
+.theme-b .hist-title { font-family: var(--font-mincho); font-weight: 600; letter-spacing: .12em; }
+.theme-b .hist-title::before { content: "HISTORY"; display: block; font-family: var(--font-en); font-size: 11px; font-weight: 500; letter-spacing: .32em; color: var(--gold); }
+.theme-b .hist-list { border: 1px solid var(--line); }
+.theme-b .hist-date { font-family: var(--font-mincho); font-weight: 600; }
+.theme-b .hint { border-radius: 2px; background: var(--accent-soft); border: 1px solid var(--gold-light); color: var(--ink); }
 
 .theme-b .sheet { border-radius: 6px 6px 0 0; }
 @media (min-width: 768px) { .theme-b .sheet { border-radius: 6px; } }
