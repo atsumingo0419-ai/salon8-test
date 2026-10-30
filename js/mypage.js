@@ -46,12 +46,16 @@
     var list = me.bookings || [];
     $("#empty").hidden = list.length > 0;
     $("#list").innerHTML = list.map(function (b) {
-      var actions = b.changeable
-        ? '<div class="bk-actions">' +
-            '<a class="btn btn-ghost" href="' + esc(LINE.link("reserve.html?change=" + encodeURIComponent(b.id))) + '">日時を変更</a>' +
-            '<button type="button" class="btn btn-danger" data-cancel="' + esc(b.id) + '">キャンセル</button>' +
-          "</div>"
-        : '<p class="bk-note">変更・キャンセルの締切（' + hours + "時間前）を過ぎています。トークでご連絡ください。</p>";
+      // 今は受け付けていないメニュー・担当（movable が false）は、日時の変更だけトークで
+      var cancelBtn = '<button type="button" class="btn btn-danger" data-cancel="' + esc(b.id) + '">キャンセル</button>';
+      var actions = !b.changeable
+        ? '<p class="bk-note">変更・キャンセルの締切（' + hours + "時間前）を過ぎています。トークでご連絡ください。</p>"
+        : b.movable === false
+          ? '<div class="bk-actions">' + cancelBtn + '</div><p class="bk-note">このご予約の日時の変更は、トークでご連絡ください。</p>'
+          : '<div class="bk-actions">' +
+              '<a class="btn btn-ghost" href="' + esc(LINE.link("reserve.html?change=" + encodeURIComponent(b.id))) + '">日時を変更</a>' +
+              cancelBtn +
+            "</div>";
       return '<div class="bk-card">' +
         '<div class="bk-date">' + esc(dateJa(b.date)) + ' <span class="bk-time">' + esc(b.time) + "〜" + esc(b.end) + "</span></div>" +
         '<p class="bk-meta"><b>' + esc(b.menuName) + "</b>　担当 " + esc(b.staffName) + "　" + esc(yen(b.price)) + "</p>" +

@@ -34,7 +34,7 @@
 /* ボタン */
 .theme-b .btn { border-radius: 2px; letter-spacing: .18em; font-weight: 500; font-size: 14px; min-height: 54px; }
 .theme-b .btn-primary { background: var(--ink); color: #F7F3EC; box-shadow: none; }
-.theme-b .btn-primary:hover { background: var(--gold); }
+@media (hover: hover) and (pointer: fine) { .theme-b .btn-primary:hover { background: var(--gold); } }
 .theme-b .btn-line,
 .theme-b .btn-outline { background: transparent; color: var(--ink); border-color: rgba(42, 36, 33, .35); }
 .theme-b .btn-line::before {
@@ -44,10 +44,12 @@
   border-radius: 50%;
   background: #06C755;
 }
-.theme-b .btn-line:hover,
-.theme-b .btn-outline:hover { background: var(--ink); color: #F7F3EC; border-color: var(--ink); }
+@media (hover: hover) and (pointer: fine) {
+  .theme-b .btn-line:hover,
+  .theme-b .btn-outline:hover { background: var(--ink); color: #F7F3EC; border-color: var(--ink); }
+}
 .theme-b .btn-ghost { border-color: rgba(42, 36, 33, .35); }
-.theme-b .btn-sm { min-height: 40px; font-size: 12px; padding: 0 18px; }
+.theme-b .btn-sm { min-height: 44px; font-size: 12px; padding: 0 18px; }
 
 /* ヘッダー */
 .theme-b .site-header { background: rgba(247, 243, 236, .92); }
@@ -238,9 +240,9 @@
 .cta-b p { margin-top: 12px; font-size: 13px; opacity: .8; }
 .cta-b .btns { position: relative; display: flex; flex-direction: column; gap: 12px; max-width: 340px; margin: 30px auto 0; }
 .cta-b .btn-primary { background: #F7F3EC; color: var(--ink); }
-.cta-b .btn-primary:hover { background: var(--gold-light); }
+@media (hover: hover) and (pointer: fine) { .cta-b .btn-primary:hover { background: var(--gold-light); } }
 .cta-b .btn-line { color: #F7F3EC; border-color: rgba(247, 243, 236, .45); }
-.cta-b .btn-line:hover { background: #F7F3EC; color: var(--ink); }
+@media (hover: hover) and (pointer: fine) { .cta-b .btn-line:hover { background: #F7F3EC; color: var(--ink); } }
 
 /* フッター */
 .footer-b { padding: 48px 0 calc(48px + var(--bar-h)); text-align: center; font-size: 12px; color: var(--muted); }
@@ -281,7 +283,7 @@
 .theme-b .r-progress li.done::before, .theme-b .r-progress li.now::before { background: var(--gold); }
 .theme-b .r-seg { margin-top: 24px; }
 .theme-b .pick { border: 1px solid var(--line); }
-.theme-b .pick:hover { border-color: var(--gold-light); }
+@media (hover: hover) and (pointer: fine) { .theme-b .pick:hover { border-color: var(--gold-light); } }
 .theme-b .pick.selected { border-color: var(--ink); background: var(--accent-soft); }
 .theme-b .pick-name { font-family: var(--font-mincho); font-weight: 600; letter-spacing: .08em; }
 .theme-b .pick-price .num { font-weight: 500; }
@@ -295,10 +297,10 @@
 .theme-b .cal-day.full .m, .theme-b .cal-day.off .m { color: var(--muted); }
 .theme-b .cal-day.selected .m { color: var(--gold-light); }
 .theme-b .cal-legend b { color: var(--gold) !important; }
-.theme-b .cal-day.ok:hover { background: var(--accent-soft); }
+@media (hover: hover) and (pointer: fine) { .theme-b .cal-day.ok:not(.selected):hover { background: var(--accent-soft); } }
 .theme-b .cal-day.selected { background: var(--ink); border-color: var(--ink); }
 .theme-b .time-btn { border-radius: 2px; border-width: 1px; font-weight: 500; }
-.theme-b .time-btn:hover { border-color: var(--gold); }
+@media (hover: hover) and (pointer: fine) { .theme-b .time-btn:hover { border-color: var(--gold); } }
 .theme-b .time-btn.selected { background: var(--ink); border-color: var(--ink); }
 .theme-b .input, .theme-b .textarea { border-radius: 2px; border-width: 1px; }
 .theme-b .input:focus, .theme-b .textarea:focus { border-color: var(--gold); box-shadow: 0 0 0 3px rgba(217, 201, 166, .35); }
@@ -324,7 +326,7 @@
 .theme-b .hist-title::before { content: "HISTORY"; display: block; font-family: var(--font-en); font-size: 11px; font-weight: 500; letter-spacing: .32em; color: var(--gold); }
 .theme-b .hist-list { border: 1px solid var(--line); }
 .theme-b .hist-date { font-family: var(--font-mincho); font-weight: 600; }
-.theme-b .hint { border-radius: 2px; background: var(--accent-soft); border: 1px solid var(--gold-light); color: var(--ink); }
+.theme-b .hint-box { border-radius: 2px; background: var(--accent-soft); border: 1px solid var(--gold-light); color: var(--ink); }
 
 .theme-b .sheet { border-radius: 6px 6px 0 0; }
 @media (min-width: 768px) { .theme-b .sheet { border-radius: 6px; } }

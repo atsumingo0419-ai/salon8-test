@@ -24,8 +24,14 @@
     line: false,     // LINE でログインして開いている
     profile: null,   // 前回 LINE で予約したときの入力
     change: null,    // 日時の変更中なら、元の予約
+    reqId: null,     // 受付番号（押し直しても二重予約にならないように、同じ内容なら同じ番号で送る）
+    reqKey: "",
     source: ({ line: "LINE", instagram: "Instagram", ig: "Instagram" })[params.get("from")] || "HP"
   };
+
+  // 手順を進めたら一瞬で先頭へ（スーッと流れると待たされる感じになる）。下に引っぱって読み直すと入力が消えるので止める
+  document.documentElement.style.scrollBehavior = "auto";
+  document.documentElement.style.overscrollBehaviorY = "none";
 
   function $(s, el) { return (el || document).querySelector(s); }
   function $$(s, el) { return Array.prototype.slice.call((el || document).querySelectorAll(s)); }
@@ -50,8 +56,12 @@
   function show(id, on) { var el = $(id); if (el) el.hidden = !on; return el; }
 
   // ---- 画面の切り替え ----
+  // 画面が変わった直後のタップは受けない（トントンと2回押すと、次の画面のカードまで押されてしまうので）
+  var shownAt = 0;
+  function tooSoon() { return Date.now() - shownAt < 400; }
   function go(n, push) {
     state.step = n;
+    shownAt = Date.now();
     $$(".r-step").forEach(function (sec) { sec.hidden = Number(sec.dataset.step) !== n; });
     $$("#progress li").forEach(function (li) {
       var p = Number(li.dataset.p);
@@ -117,6 +127,7 @@
     }).join("");
     $$(".pick", box).forEach(function (el) {
       el.addEventListener("click", function () {
+        if (tooSoon()) return;
         var m = CONFIG.menus.filter(function (x) { return x.id === el.dataset.id; })[0];
         if (!state.menu || state.menu.id !== m.id) { state.slots = {}; state.date = null; state.time = null; }
         state.menu = m;
@@ -127,6 +138,7 @@
   }
 
   // ---- 2. スタッフ ----
+  function initialOf(name) { return Array.from(name).pop() || ""; } // 絵文字で終わる名前でも割れないように
   function renderStaff() {
     var box = $("#staff-picks");
     var list = CONFIG.staff.filter(function (s) { return !!effOf(s, state.menu); });
@@ -135,7 +147,7 @@
       return;
     }
     box.innerHTML = list.map(function (s) {
-      var face = s.photo ? '<img src="' + esc(s.photo) + '" alt="">' : esc(s.name.slice(-1));
+      var face = s.photo ? '<img src="' + esc(s.photo) + '" alt="">' : esc(initialOf(s.name));
       var e = effOf(s, state.menu);
       // 担当制：このスタッフだけ料金や時間が違うときは、カードに出す
       var diff = e.price !== state.menu.price || e.minutes !== state.menu.minutes
@@ -147,8 +159,16 @@
         '<span class="pick-meta">' + esc(s.intro || "") + "</span>" + diff +
         "</button>";
     }).join("");
+    // 写真が読めないとき（Google ドライブの共有リンクなど）は頭文字に戻す
+    $$(".avatar img", box).forEach(function (img) {
+      img.addEventListener("error", function () {
+        var s = CONFIG.staff.filter(function (x) { return x.id === img.closest(".pick").dataset.id; })[0];
+        img.parentNode.textContent = initialOf(s.name);
+      });
+    });
     $$(".pick", box).forEach(function (el) {
       el.addEventListener("click", function () {
+        if (tooSoon()) return;
         var s = CONFIG.staff.filter(function (x) { return x.id === el.dataset.id; })[0];
         if (!state.staff || state.staff.id !== s.id) { state.slots = {}; state.date = null; state.time = null; }
         state.staff = s;
@@ -173,6 +193,8 @@
   var loadSeq = 0;
   function loadMonth() {
     var month = state.month, seq = ++loadSeq;
+    // 前の月の読み込み中に月を戻すと、薄いまま押せなくなるので、まず外す
+    $("#cal").classList.remove("cal-loading");
     drawCalendar();
     if (state.slots[month]) { autoPick(); return; }
     $("#cal").classList.add("cal-loading");
@@ -193,7 +215,8 @@
       if (seq !== loadSeq) return;
       $("#cal").classList.remove("cal-loading");
       $("#cal-msg").hidden = false;
-      $("#cal-msg").textContent = "空き状況を読み込めませんでした。時間をおいてもう一度お試しください。";
+      $("#cal-msg").innerHTML = '空き状況を読み込めませんでした。<button type="button" class="link-btn" id="cal-retry">もう一度読み込む</button>';
+      $("#cal-retry").addEventListener("click", loadMonth);
     });
   }
 
@@ -241,6 +264,7 @@
     grid.innerHTML = html;
     $$(".cal-day.ok", grid).forEach(function (b) {
       b.addEventListener("click", function () {
+        if (tooSoon()) return;
         state.date = b.dataset.date;
         state.time = null;
         $$(".cal-day", grid).forEach(function (x) { x.classList.toggle("selected", x === b); });
@@ -263,6 +287,7 @@
     }).join("");
     $$(".time-btn", grid).forEach(function (b) {
       b.addEventListener("click", function () {
+        if (tooSoon()) return;
         state.time = b.dataset.t;
         show("#taken-alert", false);
         // 変更のときは、前回の情報で入力を省いて確認へ
@@ -288,9 +313,18 @@
     fill(form.elements.bd, "日", 1, 31, "日");
   })();
 
-  // ひらがなで入れてもカタカナに直す
-  function toKatakana(s) { return s.replace(/[ぁ-ゖ]/g, function (c) { return String.fromCharCode(c.charCodeAt(0) + 0x60); }); }
+  // ひらがな・半角カナで入れてもカタカナに直す
+  function toKatakana(s) { return s.normalize("NFKC").replace(/[ぁ-ゖ]/g, function (c) { return String.fromCharCode(c.charCodeAt(0) + 0x60); }); }
   form.elements.kana.addEventListener("blur", function () { this.value = toKatakana(this.value); });
+  // 全角で打ったメール（ｔａｒｏ＠…）は半角に直して見せる
+  function halfEmail(s) { return s.normalize("NFKC").trim(); }
+  form.elements.email.addEventListener("blur", function () { this.value = halfEmail(this.value); });
+  // 電話番号は数字だけに。iPhone の自動入力などで「+81 90-…」と入ったら、頭の 81 を 0 に戻す
+  function telDigits(s) {
+    var d = s.replace(/[０-９]/g, function (c) { return String.fromCharCode(c.charCodeAt(0) - 0xFEE0); }).replace(/[^\d]/g, "");
+    var m = d.match(/^810?([1-9]\d{8,9})$/);
+    return m ? "0" + m[1] : d;
+  }
 
   // LINE で前に予約した人は、そのときの入力を最初から入れておく
   function profileComplete() {
@@ -332,14 +366,14 @@
       kana: oneSpace(toKatakana(form.elements.kana.value)),
       sex: sex ? sex.value : "",
       birth: by && bm && bd ? by + "-" + U.pad(Number(bm)) + "-" + U.pad(Number(bd)) : "",
-      tel: form.elements.tel.value.replace(/[０-９]/g, function (c) { return String.fromCharCode(c.charCodeAt(0) - 0xFEE0); }).replace(/[^\d]/g, ""),
-      email: form.elements.email.value.trim(),
+      tel: telDigits(form.elements.tel.value),
+      email: halfEmail(form.elements.email.value),
       visit: visit ? visit.value : "",
       focus: form.elements.focus.value.trim(),
       early: form.elements.early.value,
       note: form.elements.note.value.trim(),
       agree: form.elements.agree.checked,
-      website: form.elements.website.value
+      website: form.elements.s8_hp.value
     };
   }
   function realDate(s) {
@@ -354,7 +388,7 @@
     ok = fieldOk("sex", !!f.sex) && ok;
     ok = fieldOk("birth", realDate(f.birth)) && ok;
     ok = fieldOk("tel", /^0\d{9,10}$/.test(f.tel)) && ok;
-    ok = fieldOk("email", /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(f.email)) && ok;
+    ok = fieldOk("email", /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(f.email) && /^[\x21-\x7E]+$/.test(f.email)) && ok;
     ok = fieldOk("visit", !!f.visit) && ok;
     ok = fieldOk("agree", f.agree) && ok;
     return ok;
@@ -378,17 +412,18 @@
 
   // プライバシーポリシーは別ページに飛ばさず、重ねて開く（LINEの中のブラウザで入力が消えないように）
   var dlg = $("#privacy-dialog"), privacyLoaded = false;
+  var privacyUrl = $("#open-privacy").dataset.src || "privacy.html";
   $("#open-privacy").addEventListener("click", function () {
-    if (!dlg.showModal) { location.href = "privacy.html"; return; }
+    if (!dlg.showModal) { location.href = privacyUrl; return; }
     dlg.showModal();
     if (privacyLoaded) return;
-    fetch($("#open-privacy").dataset.src || "privacy.html").then(function (r) { return r.text(); }).then(function (html) {
+    fetch(privacyUrl).then(function (r) { return r.text(); }).then(function (html) {
       var doc = new DOMParser().parseFromString(html, "text/html");
       var main = doc.querySelector("main");
       $("#privacy-body").innerHTML = main ? main.innerHTML : "";
       privacyLoaded = true;
     }).catch(function () {
-      $("#privacy-body").innerHTML = '<p>読み込めませんでした。<a href="privacy.html">こちら</a>からご覧ください。</p>';
+      $("#privacy-body").innerHTML = '<p>読み込めませんでした。<a href="' + esc(privacyUrl) + '">こちら</a>からご覧ください。</p>';
     });
   });
   $$("[data-close]", dlg).forEach(function (b) { b.addEventListener("click", function () { dlg.close(); }); });
@@ -422,7 +457,12 @@
     return rows.map(function (r) { return "<div><dt>" + r[0] + "</dt><dd>" + r[1] + "</dd></div>"; }).join("");
   }
   function submitLabel() { return state.change ? "この日時に変更する" : "予約を確定する"; }
+  function newReqId() {
+    return window.crypto && crypto.randomUUID ? crypto.randomUUID() : Date.now().toString(36) + Math.random().toString(36).slice(2);
+  }
   function renderConfirm() {
+    var key = [state.menu.id, state.staff.id, state.date, state.time, state.form.name, state.form.tel, state.change ? state.change.id : ""].join("|");
+    if (key !== state.reqKey) { state.reqKey = key; state.reqId = newReqId(); }
     var t = $("#confirm-title");
     if (t) t.textContent = state.change ? "変更内容の確認" : "ご予約内容の確認";
     $("#confirm").innerHTML = summaryHTML(true);
@@ -456,7 +496,8 @@
       early: f.early,
       note: f.note,
       source: state.source,
-      website: f.website
+      website: f.website,
+      reqId: state.reqId
     };
     if (state.line) payload.idToken = LINE.idToken();
     if (state.change) payload.replaces = state.change.id;
@@ -483,8 +524,9 @@
       if (reason === "notfound") { showSendError("元のご予約が見つかりませんでした（すでに変更・キャンセル済みの可能性があります）。「予約の確認」をご覧ください。"); return; }
       showSendError(res && res.message);
     }).catch(function () {
+      // 通信が切れた：予約は入っているかもしれない。同じ受付番号で押し直せば、二重にはならない
       sending = false;
-      showSendError();
+      showSendError("通信が途切れて、結果を確かめられませんでした。もう一度「" + submitLabel() + "」を押してください（同じ予約が二重に入ることはありません）。うまくいかない場合は公式LINEからご連絡ください。");
     });
   });
   function showSendError(msg) {
