@@ -57,11 +57,12 @@
 
   // ---- 画面の切り替え ----
   // 画面が変わった直後のタップは受けない（トントンと2回押すと、次の画面のカードまで押されてしまうので）
+  // 経過時間は performance.now で測る（端末の時計が巻き戻っても押せなくならない）
   var shownAt = 0;
-  function tooSoon() { return Date.now() - shownAt < 400; }
+  function tooSoon() { return performance.now() - shownAt < 400; }
   function go(n, push) {
     state.step = n;
-    shownAt = Date.now();
+    shownAt = performance.now();
     $$(".r-step").forEach(function (sec) { sec.hidden = Number(sec.dataset.step) !== n; });
     $$("#progress li").forEach(function (li) {
       var p = Number(li.dataset.p);
@@ -510,12 +511,15 @@
         return;
       }
       var reason = res && res.reason;
-      if (reason === "taken") {
-        // たった今ほかの人が取った → 日時を選び直してもらう
+      if (reason === "taken" || reason === "closed") {
+        // たった今ほかの人が取った／画面を開いている間に受付の締切を過ぎた → 日時を選び直してもらう
         delete state.slots[monthOf(state.date)];
-        state.time = null;
+        var when = dateJa(state.date);
         var a = show("#taken-alert", true);
-        a.textContent = "申し訳ありません。" + dateJa(state.date) + "のその時間は、たった今ご予約が入りました。別の時間をお選びください。";
+        a.textContent = reason === "closed"
+          ? "申し訳ありません。" + when + state.time + "からのご予約は、受付の締切" + (res.hours ? "（開始の" + res.hours + "時間前まで）" : "") + "を過ぎました。別の日時をお選びください。"
+          : "申し訳ありません。" + when + "のその時間は、たった今ご予約が入りました。別の時間をお選びください。";
+        state.time = null;
         go(3);
         return;
       }

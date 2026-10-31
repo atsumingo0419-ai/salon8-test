@@ -178,7 +178,10 @@
           if (!beforeDeadline(old)) return { ok: false, reason: "deadline", hours: DATA.settings.cancelHours };
         }
         var slots = demoMonthSlots(staff, eff, p.date.slice(0, 7), old && old.id)[p.date] || [];
-        if (slots.indexOf(p.time) < 0) return { ok: false, reason: "taken" };
+        if (slots.indexOf(p.time) < 0) {
+          if (msAt(p.date, toMin(p.time)) < Date.now() + DATA.settings.leadMin * 60000) return { ok: false, reason: "closed", hours: DATA.settings.leadMin / 60 };
+          return { ok: false, reason: "taken" };
+        }
         var s = msAt(p.date, toMin(p.time));
         var id = "S8-" + p.date.slice(5).replace("-", "") + "-" + String(Math.floor(1000 + Math.random() * 9000));
         list.push({
